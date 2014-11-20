@@ -149,7 +149,34 @@ def _verify_cas2_saml(ticket, service):
         page.close()
 
 
-_PROTOCOLS = {'1': _verify_cas1, '2': _verify_cas2, '3': _verify_cas3, 'CAS_2_SAML_1_0': _verify_cas2_saml}
+def _verify_bistux(ticket, service):
+    """Verifies CAS 2.0-extend XML-based authentication ticket.
+
+    Returns username on success and None on failure.
+    """
+
+    try:
+        from xml.etree import ElementTree
+    except ImportError:
+        from elementtree import ElementTree
+
+    params = {'ticket': ticket, 'service': service}
+    url = (urljoin(settings.CAS_SERVER_URL, 'proxyValidate') + '?' +
+           urlencode(params))
+    page = urlopen(url)
+    try:
+        elements = {}
+        response = page.read()
+        tree = ElementTree.fromstring(response)
+        if tree[0].tag.endswith('authenticationSuccess'):
+            for element in tree[0]:
+                attributes[element.tag.split("}").pop()] = element.text
+        return tree[0][0].text, elements
+    finally:
+        page.close()
+
+
+_PROTOCOLS = {'1': _verify_cas1, '2': _verify_cas2, '3': _verify_cas3, 'CAS_2_SAML_1_0': _verify_cas2_saml, 'bistux': _verify_bistux}
 
 
 if settings.CAS_VERSION not in _PROTOCOLS:
