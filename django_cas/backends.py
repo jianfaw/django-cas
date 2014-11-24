@@ -170,7 +170,7 @@ def _verify_bistux(ticket, service):
         tree = ElementTree.fromstring(response)
         if tree[0].tag.endswith('authenticationSuccess'):
             for element in tree[0]:
-                attributes[element.tag.split("}").pop()] = element.text
+                elements[element.tag.split("}").pop()] = element.text
         return tree[0][0].text, elements
     finally:
         page.close()
