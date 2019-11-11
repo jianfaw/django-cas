@@ -133,7 +133,7 @@ Customizing the 403 Error Page
 
 Django doesn't provide a simple way to customize 403 error pages, so you'll
 have to make a response middleware that handles ``HttpResponseForbidden``.
-
+11111
 For example, in ``views.py``::
 
 
